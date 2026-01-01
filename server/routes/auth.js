@@ -4,12 +4,10 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// Helper function to create a token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
-// @route   POST /api/auth/register
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -27,13 +25,11 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    // Compare entered password with hashed password in DB
-    if (user && (await bcrypt.compare(password, user.password))) {
+        if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         _id: user._id,
         username: user.username,
