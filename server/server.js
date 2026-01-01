@@ -24,4 +24,4 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ DB Error:", err));
 
-app.listen(5000, () => console.log("🚀 Server on 5000"));a
+app.listen(5000, () => console.log("🚀 Server on 5000"));
