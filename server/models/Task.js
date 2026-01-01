@@ -4,7 +4,7 @@ const taskSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User' // Links the task to a specific user
+    ref: 'User' 
   },
   title: { type: String, required: true },
   description: { type: String },

@@ -18,9 +18,7 @@ const userSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Modern Async Pre-save Hook (No 'next' needed)
 userSchema.pre('save', async function () {
-  // Only hash the password if it has been modified (or is new)
   if (!this.isModified('password')) {
     return;
   }
@@ -29,7 +27,7 @@ userSchema.pre('save', async function () {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   } catch (error) {
-    throw error; // Mongoose will catch this as a save error
+    throw error; 
   }
 });
 
