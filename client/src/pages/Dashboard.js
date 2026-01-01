@@ -9,7 +9,6 @@ const Dashboard = () => {
 
   const config = { headers: { Authorization: `Bearer ${token}` } };
 
-  // We wrap this in useCallback so it can be used safely in useEffect and other functions
   const fetchTasks = useCallback(async () => {
     try {
       const { data } = await axios.get('http://localhost:5000/api/tasks', config);
@@ -17,18 +16,18 @@ const Dashboard = () => {
     } catch (err) {
       console.error("Error fetching tasks", err);
     }
-  }, [token]); // dependency on token
+  }, [token]); 
 
   useEffect(() => {
     fetchTasks();
-  }, [fetchTasks]); // fetchTasks is now a stable dependency
+  }, [fetchTasks]); 
 
   const addTask = async (e) => {
     e.preventDefault();
     try {
       await axios.post('http://localhost:5000/api/tasks', { title }, config);
       setTitle('');
-      fetchTasks(); // Now this will work!
+      fetchTasks(); 
     } catch (err) {
       alert("Error adding task");
     }
@@ -37,7 +36,7 @@ const Dashboard = () => {
   const deleteTask = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/tasks/${id}`, config);
-      fetchTasks(); // Now this will work!
+      fetchTasks(); 
     } catch (err) {
       alert("Error deleting task");
     }

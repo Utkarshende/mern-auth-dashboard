@@ -10,7 +10,6 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
-        <Navbar />
         <Routes>
           <Route path="/login" element={!user ? <Login /> : <Navigate transition to="/" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
