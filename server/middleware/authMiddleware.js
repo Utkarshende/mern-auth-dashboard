@@ -3,17 +3,13 @@ const jwt = require('jsonwebtoken');
 const protect = (req, res, next) => {
   let token;
 
-  // Check if the header has a Bearer token
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
-      // Get token from header
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Add user info to the request object so routes can use it
-      req.user = decoded;
+          req.user = decoded;
       
       next();
     } catch (error) {

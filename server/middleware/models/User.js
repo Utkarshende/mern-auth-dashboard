@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
 }, { timestamps: true });
 
-// This "deadly" trick hashes the password automatically before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
