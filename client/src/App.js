@@ -1,22 +1,24 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
-function App() {
+// Helper to check if user is logged in
+const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" />;
+};
 
+function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        {/* If no token, kick them to login */}
-        <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
   );
 }
 
-export default App;
+export default App;l
