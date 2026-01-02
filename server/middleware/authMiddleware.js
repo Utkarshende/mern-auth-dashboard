@@ -1,14 +1,15 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-  // Check for the Authorization header
+  // 1. Get header
   const authHeader = req.header('Authorization');
   
+  // 2. Check if it exists and starts with Bearer
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+    return res.status(401).json({ message: 'Authorization denied' });
   }
 
-  // Split "Bearer <token>" to get just the token
+  // 3. Extract the token part
   const token = authHeader.split(' ')[1];
 
   try {
@@ -16,7 +17,7 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded; // Attach user payload to request
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
+    res.status(401).json({ message: 'Token is invalid' });
   }
 };
 

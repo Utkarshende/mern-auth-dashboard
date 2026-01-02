@@ -1,18 +1,19 @@
 import axios from 'axios';
 
 const API = axios.create({
-  // Use your Render URL for production, localhost for development
-  baseURL: 'https://mern-auth-dashboard-backend.onrender.com/api', 
+  baseURL: 'http://localhost:5000/api',
 });
 
-// This interceptor automatically attaches the token to every request
+// Automatically attach JWT to every request
 API.interceptors.request.use((req) => {
-  const userInfo = localStorage.getItem('userInfo');
+  const data = localStorage.getItem('userInfo');
   
-  if (userInfo) {
-    const { token } = JSON.parse(userInfo);
-    // Standard JWT Format: "Bearer <token>"
-    req.headers.Authorization = `Bearer ${token}`;
+  if (data) {
+    const userInfo = JSON.parse(data);
+    // Ensure you are accessing .token (or whatever your backend returns)
+    if (userInfo.token) {
+      req.headers.Authorization = `Bearer ${userInfo.token}`;
+    }
   }
   return req;
 });
