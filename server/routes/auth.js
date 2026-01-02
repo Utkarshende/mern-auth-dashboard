@@ -1,41 +1,23 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
-// @route   POST /api/auth/register
-router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
-  try {
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: 'User already exists' });
-
-    user = new User({ username, email, password });
-    await user.save();
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, user: { id: user._id, username, email } });
-  } catch (err) {
-    res.status(500).send('Server Error');
+const auth = (req, res, next) => {
+  // Look for the Authorization header
+  const authHeader = req.header('Authorization');
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token, authorization denied' });
   }
-});
 
-// @route   POST /api/auth/login
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  // Extract the actual token string
+  const token = authHeader.split(' ')[1];
+
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid Credentials' });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid Credentials' });
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, user: { id: user._id, username: user.username, email } });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Store user ID (from token payload) in request
+    next();
   } catch (err) {
-    res.status(500).send('Server Error');
+    res.status(401).json({ message: 'Token is not valid' });
   }
-});
+};
 
-module.exports = router;
+module.exports = auth;
