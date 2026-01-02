@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth'); // Pointing to the middleware folder
+const auth = require('../middleware/authMiddleware'); // Pointing to the middleware folder
 const Task = require('../models/Task');
 
 // Get all tasks
