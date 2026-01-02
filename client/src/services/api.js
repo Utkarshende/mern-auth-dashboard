@@ -1,17 +1,15 @@
 import axios from 'axios';
 
 const API = axios.create({
-  // Use the environment variable for production, fallback to localhost for dev
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  // This will use your Vercel Env Var, or default to Render
+  baseURL: process.env.REACT_APP_API_URL || 'https://mern-auth-dashboard-backend.onrender.com/api',
 });
 
-// Middleware to attach the JWT token to every request
+// Attach Token to every request automatically
 API.interceptors.request.use((req) => {
-  const user = localStorage.getItem('userInfo') 
-    ? JSON.parse(localStorage.getItem('userInfo')) 
-    : null;
-    
-  if (user && user.token) {
+  const profile = localStorage.getItem('userInfo');
+  if (profile) {
+    const user = JSON.parse(profile);
     req.headers.Authorization = `Bearer ${user.token}`;
   }
   return req;
