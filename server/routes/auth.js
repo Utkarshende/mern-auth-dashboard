@@ -1,72 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-// Helper function to create Token
-const generateToken = (id) => {
-  if (!process.env.JWT_SECRET) {
-    console.error("❌ CRITICAL ERROR: JWT_SECRET is not defined in .env file");
-    return null;
-  }
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-};
-
-// @desc    Register new user
 // @route   POST /api/auth/register
 router.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
   try {
-    const { username, email, password } = req.body;
+    let user = await User.findOne({ email });
+    if (user) return res.status(400).json({ message: 'User already exists' });
 
-    // 1. Check if user exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
+    user = new User({ username, email, password });
+    await user.save();
 
-    // 2. Create User
-    const user = await User.create({ username, email, password });
-
-    // 3. Generate Token
-    const token = generateToken(user._id);
-    if (!token) {
-      return res.status(500).json({ message: "Token generation failed. Check server logs." });
-    }
-
-    res.status(201).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      token: token,
-    });
-  } catch (error) {
-    console.error("❌ REGISTER ERROR:", error);
-    res.status(500).json({ message: error.message || "Internal Server Error" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token, user: { id: user._id, username, email } });
+  } catch (err) {
+    res.status(500).send('Server Error');
   }
 });
 
-// @desc    Login user
 // @route   POST /api/auth/login
 router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
-
     const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'Invalid Credentials' });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      res.json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
-    }
-  } catch (error) {
-    console.error("❌ LOGIN ERROR:", error);
-    res.status(500).json({ message: error.message || "Internal Server Error" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid Credentials' });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token, user: { id: user._id, username: user.username, email } });
+  } catch (err) {
+    res.status(500).send('Server Error');
   }
 });
 
