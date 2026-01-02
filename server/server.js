@@ -14,7 +14,7 @@ app.use(cors({
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/tasks', require('./routes/tasks'));
 
 // Health Check
 app.get('/', (req, res) => res.send('API Running'));
