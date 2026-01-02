@@ -1,31 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const auth = require('../middleware/auth'); // Pointing to the middleware folder
 const Task = require('../models/Task');
 
-// @route   GET /api/tasks
-// @desc    Get all tasks for the logged-in user
+// Get all tasks
 router.get('/', auth, async (req, res) => {
   try {
-    const tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
+    const tasks = await Task.find({ user: req.user.id });
     res.json(tasks);
   } catch (err) {
-    res.status(500).json({ message: 'Server Error fetching tasks' });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// @route   POST /api/tasks
-// @desc    Create a new task
+// Create task
 router.post('/', auth, async (req, res) => {
   try {
-    const newTask = new Task({
-      title: req.body.title,
-      user: req.user.id
-    });
+    const newTask = new Task({ title: req.body.title, user: req.user.id });
     const savedTask = await newTask.save();
     res.json(savedTask);
   } catch (err) {
-    res.status(500).json({ message: 'Server Error saving task' });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
