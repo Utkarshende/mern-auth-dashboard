@@ -1,19 +1,17 @@
 import axios from 'axios';
 
 const API = axios.create({
-  // Use your Render URL here to stop the localhost error
-  baseURL: 'https://mern-auth-dashboard-backend.onrender.com/api',
+  // Fallback to localhost if the environment variable isn't set
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
 });
 
-// Add a request interceptor to attach the token
+// Attach the JWT token to every request automatically
 API.interceptors.request.use((req) => {
-  const profile = localStorage.getItem('userInfo');
-  
-  if (profile) {
-    const user = JSON.parse(profile);
-    // Ensure "token" matches the key name used in your Backend response
-    if (user.token) {
-      req.headers.Authorization = `Bearer ${user.token}`;
+  const userInfo = localStorage.getItem('userInfo');
+  if (userInfo) {
+    const { token } = JSON.parse(userInfo);
+    if (token) {
+      req.headers.Authorization = `Bearer ${token}`;
     }
   }
   return req;
