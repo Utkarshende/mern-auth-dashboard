@@ -17,7 +17,6 @@ const Register = () => {
       const { data } = await API.post('/auth/register', formData);
       localStorage.setItem('userInfo', JSON.stringify(data));
       navigate('/');
-      window.location.reload(); 
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Try again.');
     } finally {

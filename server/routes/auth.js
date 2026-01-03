@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
     user = new User({ username, email, password });
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({ token, user: { id: user._id, username, email } });
   } catch (err) {
     res.status(500).json({ message: 'Registration failed' });
@@ -33,7 +33,7 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, user: { id: user._id, username: user.username, email } });
   } catch (err) {
     res.status(500).json({ message: 'Login failed' });

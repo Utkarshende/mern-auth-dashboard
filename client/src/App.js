@@ -5,13 +5,14 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
 function App() {
-  const user = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfo = localStorage.getItem('userInfo');
+  const user = userInfo ? JSON.parse(userInfo) : null;
 
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
         <Routes>
-          <Route path="/login" element={!user ? <Login /> : <Navigate transition to="/" />} />
+          <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
           <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
         </Routes>
