@@ -7,7 +7,6 @@ const Dashboard = () => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // FETCH TASKS
   const fetchTasks = useCallback(async () => {
     try {
       const { data } = await API.get('/tasks');
@@ -21,14 +20,12 @@ const Dashboard = () => {
     fetchTasks();
   }, [fetchTasks]);
 
-  // ADD TASK
   const addTask = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
     
     try {
       const { data } = await API.post('/tasks', { title });
-      // Optimistic Update: Add to list without full refresh
       setTasks((prev) => [data, ...prev]);
       setTitle('');
     } catch (err) {
@@ -36,21 +33,17 @@ const Dashboard = () => {
     }
   };
 
-  // DELETE TASK
   const deleteTask = async (id) => {
     if (!id) {
         console.error("Delete failed: No Task ID provided");
         return;
     }
 
-    // Optional: Ask for confirmation
     if (!window.confirm("Delete this task?")) return;
 
     try {
-      // 1. Call the API
       await API.delete(`/tasks/${id}`);
       
-      // 2. Update UI locally (Faster than re-fetching)
       setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
       
       console.log(`Task ${id} deleted successfully`);
@@ -59,7 +52,6 @@ const Dashboard = () => {
       const errorMsg = err.response?.data?.message || "Delete failed";
       alert(errorMsg);
       
-      // If the error is 404, the task is already gone, refresh list
       if (err.response?.status === 404) fetchTasks();
     }
   };
@@ -106,7 +98,6 @@ const Dashboard = () => {
       <div className="grid gap-4">
         {filteredTasks.length > 0 ? (
           filteredTasks.map(task => (
-            // Ensure we use task._id for both the key and the delete argument
             <div key={task._id} className="flex justify-between items-center bg-white p-4 rounded shadow border hover:shadow-md transition">
               <span className="text-lg text-gray-800">{task.title}</span>
               <button

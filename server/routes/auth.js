@@ -4,15 +4,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// @route   POST /api/auth/register
-// NOTE: No 'auth' middleware here!
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: 'User already exists' });
 
-    // Password hashing happens automatically in the User Model (see below)
     user = new User({ username, email, password });
     await user.save();
 
@@ -23,7 +20,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
