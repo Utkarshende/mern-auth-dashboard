@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import API from '../services/api';
 
 const Login = () => {
@@ -12,10 +12,10 @@ const Login = () => {
     try {
       const { data } = await API.post('/auth/login', formData);
       
-      // Save user data and token
+      // Save user data and token to localStorage
       localStorage.setItem('userInfo', JSON.stringify(data));
       
-      // Force a full redirect to the dashboard to refresh the app state
+      // Force a full redirect to clear state and trigger PrivateRoute check
       window.location.href = '/dashboard';
     } catch (err) {
       alert(err.response?.data?.message || "Invalid Credentials");
@@ -24,35 +24,52 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={onSubmit} className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login to TaskPulse</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-2 mb-4 border rounded"
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-2 mb-4 border rounded"
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
-        />
+    <div className="flex justify-center items-center h-screen bg-gray-100 px-4">
+      <form onSubmit={onSubmit} className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-bold mb-6 text-center text-blue-600">Login</h2>
+        
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2 text-sm font-semibold">Email Address</label>
+          <input
+            type="email"
+            name="email"
+            autoComplete="username"
+            placeholder="email@example.com"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-gray-700 mb-2 text-sm font-semibold">Password</label>
+          <input
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+          />
+        </div>
+
         <button 
+          type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          className={`w-full py-3 rounded-lg font-bold text-white transition ${
+            loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
           {loading ? 'Authenticating...' : 'Login'}
         </button>
-        <p className="mt-4 text-center">
-          New user? <Link to="/register" className="text-blue-500">Register here</Link>
+
+        <p className="mt-6 text-center text-gray-600">
+          Don't have an account? <Link to="/register" className="text-blue-500 hover:underline font-semibold">Register</Link>
         </p>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Login; 

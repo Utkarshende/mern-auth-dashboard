@@ -1,66 +1,81 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../services/api';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-
     try {
-      const { data } = await API.post('/auth/register', formData);
-      localStorage.setItem('userInfo', JSON.stringify(data));
-      navigate('/');
+      await API.post('/auth/register', formData);
+      alert("Registration successful! Please login.");
+      navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Try again.');
-    } finally {
+      alert(err.response?.data?.message || "Registration failed");
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center text-indigo-600">Create Account</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+    <div className="flex justify-center items-center h-screen bg-gray-100 px-4">
+      <form onSubmit={onSubmit} className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-bold mb-6 text-center text-green-600">Create Account</h2>
         
-        <input
-          className="w-full p-2 mb-4 border rounded"
-          type="text"
-          placeholder="Username"
-          required
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-        />
-        <input
-          className="w-full p-2 mb-4 border rounded"
-          type="email"
-          placeholder="Email"
-          required
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-        <input
-          className="w-full p-2 mb-6 border rounded"
-          type="password"
-          placeholder="Password"
-          required
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-        />
-        
-        <button
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2 text-sm font-semibold">Full Name</label>
+          <input
+            type="text"
+            name="name"
+            autoComplete="name"
+            placeholder="John Doe"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-400"
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2 text-sm font-semibold">Email Address</label>
+          <input
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="email@example.com"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-400"
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-gray-700 mb-2 text-sm font-semibold">Password</label>
+          <input
+            type="password"
+            name="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-400"
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+          />
+        </div>
+
+        <button 
+          type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 disabled:bg-gray-400"
+          className={`w-full py-3 rounded-lg font-bold text-white transition ${
+            loading ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+          }`}
         >
           {loading ? 'Creating Account...' : 'Register'}
         </button>
-        
-        <p className="mt-4 text-center text-sm">
-          Already have an account? <Link to="/login" className="text-indigo-600 underline">Login</Link>
+
+        <p className="mt-6 text-center text-gray-600">
+          Already have an account? <Link to="/login" className="text-green-500 hover:underline font-semibold">Login</Link>
         </p>
       </form>
     </div>
