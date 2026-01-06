@@ -1,62 +1,54 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import API from './../services/api';
+import API from '../services/api';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-
     try {
-      const { data } = await API.post('/auth/login', { email, password });
+      const { data } = await API.post('/auth/login', formData);
+      
+      // Save user data and token
       localStorage.setItem('userInfo', JSON.stringify(data));
-      navigate('/');
+      
+      // Force a full redirect to the dashboard to refresh the app state
+      window.location.href = '/dashboard';
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password');
-    } finally {
+      alert(err.response?.data?.message || "Invalid Credentials");
       setLoading(false);
     }
   };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center text-indigo-600">Login to TaskPulse</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-        
+      <form onSubmit={onSubmit} className="bg-white p-8 rounded shadow-md w-96">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login to TaskPulse</h2>
         <input
-          className="w-full p-2 mb-4 border rounded"
           type="email"
           placeholder="Email"
+          className="w-full p-2 mb-4 border rounded"
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
         />
         <input
-          className="w-full p-2 mb-6 border rounded"
           type="password"
           placeholder="Password"
+          className="w-full p-2 mb-4 border rounded"
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
         />
-        
-        <button
+        <button 
           disabled={loading}
-          className="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 disabled:bg-gray-400"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
         >
           {loading ? 'Authenticating...' : 'Login'}
         </button>
-        
-        <p className="mt-4 text-center text-sm">
-          New user? <Link to="/register" className="text-indigo-600 underline">Register here</Link>
+        <p className="mt-4 text-center">
+          New user? <Link to="/register" className="text-blue-500">Register here</Link>
         </p>
       </form>
     </div>
