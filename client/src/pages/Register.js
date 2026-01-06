@@ -5,22 +5,24 @@ import API from '../services/api';
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Now we will actually use this
 
-const onSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    await API.post('/auth/register', formData);
-    alert("Registration successful!");
-    window.location.href = '/login';
-  } catch (err) {
-    // This displays the specific message from the backend (e.g., 'User already exists')
-    const message = err.response?.data?.message || "Registration failed";
-    alert(message);
-    setLoading(false);
-  }
-};
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await API.post('/auth/register', formData);
+      alert("Registration successful! Redirecting to login...");
+      
+      // FIXED: Using navigate instead of window.location.href
+      navigate('/login'); 
+    } catch (err) {
+      const message = err.response?.data?.message || "Registration failed";
+      alert(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100 px-4">
