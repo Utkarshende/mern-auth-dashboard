@@ -7,15 +7,16 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true }
 }, { timestamps: true });
 
-// Hash password before saving to DB
-UserSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+// CORRECTED HOOK: Using async/await without the 'next' callback is cleaner
+UserSchema.pre('save', async function() {
+  // 'this' refers to the user document
+  if (!this.isModified('password')) return;
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
   } catch (err) {
-    next(err);
+    throw new Error(err);
   }
 });
 
