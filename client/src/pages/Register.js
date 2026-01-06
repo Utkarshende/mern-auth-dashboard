@@ -7,23 +7,20 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await API.post('/auth/register', formData);
-      console.log("Registration Success:", response.data);
-      alert("Registration successful! Redirecting to login...");
-      navigate('/login');
-    } catch (err) {
-      // Log the actual error from the server
-      const errMsg = err.response?.data?.message || "Registration failed. Check server logs.";
-      console.error("Registration Error Detail:", err.response?.data);
-      alert(errMsg);
-    } finally {
-      setLoading(false);
-    }
-  };
+const onSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    await API.post('/auth/register', formData);
+    alert("Registration successful!");
+    window.location.href = '/login';
+  } catch (err) {
+    // This displays the specific message from the backend (e.g., 'User already exists')
+    const message = err.response?.data?.message || "Registration failed";
+    alert(message);
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100 px-4">
