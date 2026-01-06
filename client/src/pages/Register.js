@@ -11,11 +11,16 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await API.post('/auth/register', formData);
-      alert("Registration successful! Please login.");
+      const response = await API.post('/auth/register', formData);
+      console.log("Registration Success:", response.data);
+      alert("Registration successful! Redirecting to login...");
       navigate('/login');
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      // Log the actual error from the server
+      const errMsg = err.response?.data?.message || "Registration failed. Check server logs.";
+      console.error("Registration Error Detail:", err.response?.data);
+      alert(errMsg);
+    } finally {
       setLoading(false);
     }
   };
@@ -31,7 +36,7 @@ const Register = () => {
             type="text"
             name="name"
             autoComplete="name"
-            placeholder="Your Name"
+            placeholder="John Doe"
             className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-400"
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
