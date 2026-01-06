@@ -7,8 +7,8 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true }
 }, { timestamps: true });
 
-// CORRECTED: Async pre-save hook without the 'next' parameter
-UserSchema.pre('save', async function () {
+// Hash password before saving
+UserSchema.pre('save', async function() {
   // Only hash the password if it has been modified (or is new)
   if (!this.isModified('password')) return;
 
@@ -16,7 +16,7 @@ UserSchema.pre('save', async function () {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   } catch (err) {
-    throw new Error('Password hashing failed: ' + err.message);
+    throw new Error('Hashing failed');
   }
 });
 

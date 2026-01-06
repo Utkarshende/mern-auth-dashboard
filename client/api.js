@@ -4,13 +4,14 @@ const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
 });
 
-// Add a request interceptor
+// Interceptor to attach token
 API.interceptors.request.use((config) => {
   const userInfo = localStorage.getItem('userInfo');
   if (userInfo) {
-    const { token } = JSON.parse(userInfo);
+    const parsedData = JSON.parse(userInfo);
+    // Note: Adjust this based on your backend response structure
+    const token = parsedData.token;
     if (token) {
-      // Ensure there is a space after 'Bearer'
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
