@@ -31,7 +31,7 @@ const Register = () => {
             type="text"
             name="name"
             autoComplete="name"
-            placeholder="John Doe"
+            placeholder="Your Name"
             className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-400"
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
