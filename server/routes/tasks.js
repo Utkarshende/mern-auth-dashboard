@@ -3,7 +3,7 @@ const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const Task = require('../models/Task');
 
-// @route   GET /api/tasks (Fetch all)
+// @route   GET /api/tasks
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const tasks = await Task.find({ user: req.user.id }).sort({ createdAt: -1 });
@@ -13,7 +13,7 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-// @route   POST /api/tasks (Create)
+// @route   POST /api/tasks
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const { title } = req.body;
@@ -25,13 +25,11 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-// @route   PUT /api/tasks/:id (The Fix for 404 on Update)
+// @route   PUT /api/tasks/:id (Edit Title)
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { title } = req.body;
-    // Find task by ID from URL params
     let task = await Task.findById(req.params.id);
-
     if (!task) return res.status(404).json({ message: 'Task not found' });
     if (task.user.toString() !== req.user.id) return res.status(401).json({ message: 'Not authorized' });
 
@@ -43,11 +41,25 @@ router.put('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// @route   DELETE /api/tasks/:id (The Fix for 404 on Delete)
+// @route   PATCH /api/tasks/:id/toggle (Toggle Completion)
+router.patch('/:id/toggle', authMiddleware, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+    if (task.user.toString() !== req.user.id) return res.status(401).json({ message: 'Not authorized' });
+
+    task.completed = !task.completed;
+    await task.save();
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @route   DELETE /api/tasks/:id
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
-
     if (!task) return res.status(404).json({ message: 'Task not found' });
     if (task.user.toString() !== req.user.id) return res.status(401).json({ message: 'Not authorized' });
 
