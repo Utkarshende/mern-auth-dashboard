@@ -1,34 +1,32 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // Ensure this is the 'cors' package
 require('dotenv').config();
 
 const app = express();
 
-// 1. ROBUST CORS CONFIGURATION
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://mern-auth-dashboard.netlify.app"
-];
+// 1. MANUAL CORS MIDDLEWARE (Fixed for Node v22 compatibility)
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "https://mern-auth-dashboard.netlify.app"
+  ];
+  const origin = req.headers.origin;
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
-}));
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
 
-// Manually handle OPTIONS requests (Preflight)
-app.options('*', cors());
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // FIX: Handle Preflight (OPTIONS) without using the '*' wildcard that crashes Node v22
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 app.use(express.json());
 
@@ -44,6 +42,6 @@ mongoose.connect(process.env.MONGO_URI)
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
   .catch(err => {
-    console.error('❌ MongoDB connection error:', err);
+    console.error('❌ Connection Error:', err);
     process.exit(1);
   });
