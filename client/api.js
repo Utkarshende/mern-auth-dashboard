@@ -1,28 +1,22 @@
 import axios from 'axios';
 
-// Check if we are in production (Netlify) or local
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
 const API = axios.create({
-  baseURL: baseURL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
 });
 
-API.interceptors.request.use((req) => {
+// Add a request interceptor
+API.interceptors.request.use((config) => {
   const userInfo = localStorage.getItem('userInfo');
   if (userInfo) {
-    try {
-      const { token } = JSON.parse(userInfo);
-      if (token) {
-        req.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (error) {
-      console.error("Token parsing error", error);
+    const { token } = JSON.parse(userInfo);
+    if (token) {
+      // Ensure there is a space after 'Bearer'
+      config.headers.Authorization = `Bearer ${token}`;
     }
   }
-  return req;
+  return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 export default API;
