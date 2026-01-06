@@ -35,17 +35,12 @@ const Dashboard = () => {
   const deleteTask = async (id) => {
     if (!window.confirm("Delete task?")) return;
     try {
-      // Hits DELETE https://.../api/tasks/ID_HERE
+      // Logic: /api/tasks/6957a46...
       await API.delete(`/tasks/${id}`);
       setTasks(tasks.filter(t => t._id !== id));
     } catch (err) {
       alert(err.response?.data?.message || "Delete failed");
     }
-  };
-
-  const handleEditClick = (task) => {
-    setEditingId(task._id);
-    setEditTitle(task.title);
   };
 
   const updateTask = async (id) => {
@@ -67,11 +62,11 @@ const Dashboard = () => {
         <button onClick={() => { localStorage.clear(); window.location.href='/login'; }} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">Logout</button>
       </div>
 
-      <input className="w-full border p-3 mb-6 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="🔍 Search tasks..." value={search} onChange={(e) => setSearch(e.target.value)} />
+      <input className="w-full border p-3 mb-6 rounded-lg shadow-sm" placeholder="🔍 Search tasks..." value={search} onChange={(e) => setSearch(e.target.value)} />
 
       <form onSubmit={addTask} className="flex gap-4 mb-8">
-        <input className="flex-grow border p-3 rounded-lg focus:ring-2 focus:ring-green-400 outline-none" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter new task..." required />
-        <button className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition">Add</button>
+        <input className="flex-grow border p-3 rounded-lg" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter new task..." required />
+        <button className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold">Add</button>
       </form>
 
       {loading ? (
@@ -79,7 +74,7 @@ const Dashboard = () => {
       ) : (
         <div className="grid gap-3">
           {filteredTasks.map(task => (
-            <div key={task._id} className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border hover:border-blue-200 transition">
+            <div key={task._id} className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border">
               {editingId === task._id ? (
                 <div className="flex gap-2 flex-grow mr-4">
                   <input className="border p-2 flex-grow rounded" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
@@ -90,14 +85,13 @@ const Dashboard = () => {
                 <>
                   <span className="text-lg text-gray-700">{task.title}</span>
                   <div className="flex gap-4">
-                    <button onClick={() => handleEditClick(task)} className="text-blue-500 font-medium hover:underline">Edit</button>
-                    <button onClick={() => deleteTask(task._id)} className="text-red-500 font-medium hover:underline">Delete</button>
+                    <button onClick={() => { setEditingId(task._id); setEditTitle(task.title); }} className="text-blue-500 font-medium">Edit</button>
+                    <button onClick={() => deleteTask(task._id)} className="text-red-500 font-medium">Delete</button>
                   </div>
                 </>
               )}
             </div>
           ))}
-          {filteredTasks.length === 0 && <p className="text-center text-gray-400 mt-10">No tasks found.</p>}
         </div>
       )}
     </div>
